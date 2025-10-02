@@ -2,12 +2,69 @@ from main import BooksCollector
 
 # класс TestBooksCollector объединяет набор тестов, которыми мы покрываем наше приложение BooksCollector
 # обязательно указывать префикс Test
+class BooksCollector:
+
+    def __init__(self):
+        self.books_genre = {}
+        self.favorites = []
+        self.genre = ['Фантастика', 'Ужасы', 'Детективы', 'Мультфильмы', 'Комедии']
+        self.genre_age_rating = ['Ужасы', 'Детективы']
+
+    # добавляем новую книгу
+    def add_new_book(self, name):
+        if not self.books_genre.get(name) and 0 < len(name) < 41:
+            self.books_genre[name] = ''
+
+    # устанавливаем книге жанр
+    def set_book_genre(self, name, genre):
+        if name in self.books_genre and genre in self.genre:
+            self.books_genre[name] = genre
+
+    # получаем жанр книги по её имени
+    def get_book_genre(self, name):
+        return self.books_genre.get(name)
+
+    # выводим список книг с определённым жанром
+    def get_books_with_specific_genre(self, genre):
+        books_with_specific_genre = []
+        if self.books_genre and genre in self.genre:
+            for name, book_genre in self.books_genre.items():
+                if book_genre == genre:
+                    books_with_specific_genre.append(name)
+        return books_with_specific_genre
+
+    # получаем словарь books_genre
+    def get_books_genre(self):
+        return self.books_genre
+
+    # возвращаем книги, подходящие детям
+    def get_books_for_children(self):
+        books_for_children = []
+        for name, genre in self.books_genre.items():
+            if genre not in self.genre_age_rating and genre in self.genre:
+                books_for_children.append(name)
+        return books_for_children
+
+    # добавляем книгу в Избранное
+    def add_book_in_favorites(self, name):
+        if name in self.books_genre:
+            if name not in self.favorites:
+                self.favorites.append(name)
+
+    # удаляем книгу из Избранного
+    def delete_book_from_favorites(self, name):
+        if name in self.favorites:
+            self.favorites.remove(name)
+
+    # получаем список Избранных книг
+    def get_list_of_favorites_books(self):
+        return self.favorites
+
+from main import BooksCollector
+
 class TestBooksCollector:
 
-    # пример теста:
-    # обязательно указывать префикс test_
-    # дальше идет название метода, который тестируем add_new_book_
-    # затем, что тестируем add_two_books - добавление двух книг
+        # проверка добавления новых книг 
     def test_add_new_book_add_two_books(self):
         # создаем экземпляр (объект) класса BooksCollector
         collector = BooksCollector()
@@ -16,9 +73,145 @@ class TestBooksCollector:
         collector.add_new_book('Гордость и предубеждение и зомби')
         collector.add_new_book('Что делать, если ваш кот хочет вас убить')
 
-        # проверяем, что добавилось именно две
-        # словарь books_rating, который нам возвращает метод get_books_rating, имеет длину 2
-        assert len(collector.get_books_rating()) == 2
+        # проверяем, что добавилось именно две книги
+        # словарь books_genre, который нам возвращает метод get_books_genre, имеет длину 2
+        assert len(collector.get_books_genre()) == 2
 
-    # напиши свои тесты ниже
-    # чтобы тесты были независимыми в каждом из них создавай отдельный экземпляр класса BooksCollector()
+        # проверяем отказ в добавлении книги с количеством символов в  названии >= 41
+    def test__add_new_book_add_48_len(self):
+        collector = BooksCollector()
+        collector.add_new_book("Сказка-сказка-сказка-сказка-сказка-сказка-сказка")    
+        books_genre = {}
+        # проверяем, что книга с 48 символами не добавлена в библиотеку
+        assert collector.add_new_book("Сказка-сказка-сказка-сказка-сказка-сказка-сказка") not in books_genre
+        
+        # проверка установки книге жанра из находящихся в списке жанров
+    def test_set_book_genre_book_name_in_books_genre_and_genre_in_genre(self):
+        collector = BooksCollector()
+        # добавляем новую книгу  и устанавливаем жанр
+        collector.add_new_book('Гордость и предубеждение и зомби')
+        collector.set_book_genre('Гордость и предубеждение и зомби', 'Ужасы')
+        # проверяем установку жанра
+        assert collector.get_book_genre('Гордость и предубеждение и зомби') == 'Ужасы'
+
+        # проверка невозможности установки книге жанра отсутствующего в списке жанров
+    def test_set_book_genre_book_name_in_books_genre_and_genre_not_in_genre(self):
+        collector = BooksCollector()
+        genre = ['Фантастика', 'Ужасы', 'Детективы', 'Мультфильмы', 'Комедии']
+        # добавляем новую книгу  и устанавливаем жанр, отсутсвущий в списке
+        collector.add_new_book('Гордость и предубеждение и зомби')
+        collector.set_book_genre('Гордость и предубеждение и зомби', 'Драмма')
+        # проверяем отказ установки жанра
+        assert collector.get_book_genre('Гордость и предубеждение и зомби') not in genre
+   
+        # проверка невозможности установки жанра находящихся в списке жанров книге, отсутсвующей в библиотеке
+    def test_set_book_genre_book_name_not_in_books_genre_and_genre_in_genre(self):
+        collector = BooksCollector()
+        # добавляем новую книгу  и устанавливаем жанр другой книге
+        collector.add_new_book('Гордость и предубеждение и зомби')
+        collector.set_book_genre('12345', 'Ужасы')
+        # проверяем отказ установки жанра
+        assert collector.get_book_genre('12345') is None
+    
+        # проверка получения жанра книги по ее имени
+    def test_get_book_genre_book_and_genre_in_books_genre(self):
+        collector = BooksCollector()
+        # добавляем новую книгу  и устанавливаем жанр
+        collector.add_new_book('Гордость и предубеждение и зомби')
+        collector.set_book_genre('Гордость и предубеждение и зомби', 'Ужасы')
+
+        # проверяем получение жанра книги по ее имени
+        assert collector.get_book_genre('Гордость и предубеждение и зомби') == 'Ужасы'
+
+        # проверка получения из библиотеки списка книг с определенным жанром 
+    def test_get_books_with_specific_genre_book_in_books_genre(self):
+        collector = BooksCollector()
+       # добавляем новую книгу  и устанавливаем жанр
+        collector.add_new_book('Гордость и предубеждение и зомби')
+        collector.set_book_genre('Гордость и предубеждение и зомби', 'Ужасы')
+       
+        # проверяем, что возвращается книга с указанным жанром
+        assert collector.get_books_with_specific_genre('Ужасы') == ['Гордость и предубеждение и зомби']
+
+        # проверка получения словаря books_genre
+    def test_get_books_genre(self):
+
+        # добавляем новую книгу  и устанавливаем жанр
+        collector = BooksCollector()
+        collector.add_new_book('Гордость и предубеждение и зомби')
+        collector.set_book_genre('Гордость и предубеждение и зомби', 'Ужасы')
+        # проверяем, что возвращается словарь
+        assert collector.get_books_genre() == {'Гордость и предубеждение и зомби': 'Ужасы'}
+    
+
+        # проверка включения в список детских книг книги жанра не находящегося в списке genre_age_rating
+    def test_get_books_for_children_rating_not_in_genre_age_rating(self):
+        collector = BooksCollector()
+        
+        # добавляем книгу для детей
+        collector.add_new_book('Академия')
+        collector.set_book_genre('Академия', 'Фантастика')
+        
+        # получаем список книг для детей
+        books_for_children = collector.get_books_for_children()
+        
+        # проверка включения в список книги с жанром для детей
+        assert 'Академия' in books_for_children
+        
+            
+     # проверка невключения в список детских книг книги жанра находящегося в списке genre_age_rating
+    def test_get_books_for_children_in_genre_age_rating(self):
+        collector = BooksCollector()
+        
+        # добавляем книгу для взрослых
+        collector.add_new_book('Гордость и предубеждение и зомби')
+        collector.set_book_genre('Гордость и предубеждение и зомби', 'Ужасы')        
+
+        # получаем список книг для детей
+        books_for_children = collector.get_books_for_children()
+        
+        # проверка невключения в список книги с жанром для взрослых
+        assert 'Гордость и предубеждение и зомби' not in books_for_children
+
+    # проверка добавления новой книги в Избранное
+    def test_add_book_in_favorites_new(self):
+        collector = BooksCollector()
+    # добавляем новую книгу
+        collector.add_new_book('Академия')
+               
+        collector.add_book_in_favorites('Академия')
+        assert 'Академия' in collector.favorites
+
+    # проверка невозможноти добавить повторно книгу в избранное
+    def test_add_book_in_favorites_already_added(self):
+        collector = BooksCollector()
+    # добавляем новую книгу
+        collector.add_new_book('Академия')
+        collector.add_book_in_favorites('Академия')
+    # добавляем книгу повторно
+        collector.add_book_in_favorites('Академия') 
+
+    # проверяем, что в списке только одна книга
+        assert len(collector.favorites) == 1      
+
+
+    # проверка удаляения книги из Избранного
+    def test_delete_book_from_favorites(self):
+        collector = BooksCollector()
+    # добавляем книгу
+        collector.add_new_book('Академия')
+           
+    # проверка удаляения книги
+        collector.delete_book_from_favorites('Академия')
+        assert 'Академия' not in collector.favorites
+
+    # проверка получения списка Избранного
+    def test_get_list_of_favorites_books(self):
+        collector = BooksCollector()
+        
+    # добавляем книгу
+        collector.add_new_book('Академия')
+                
+        collector.add_book_in_favorites('Академия')
+    # проверяем наличие книги в Избранном
+        assert 'Академия' in collector.favorites
