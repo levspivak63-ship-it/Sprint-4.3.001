@@ -39,4 +39,4 @@ tests.py::TestBooksCollector::test_get_books_for_children_in_genre_age_rating PA
 tests.py::TestBooksCollector::test_add_book_in_favorites_new PASSED                                                                      [ 78%]
 tests.py::TestBooksCollector::test_add_book_in_favorites_already_added PASSED                                                            [ 85%]
 tests.py::TestBooksCollector::test_delete_book_from_favorites PASSED                                                                     [ 92%]
-tests.py::TestBooksCollector::test_get_list_of_favorites_books PASSED        
+tests.py::TestBooksCollector::test_get_list_of_favorites_books PASSED                                                                    [100%] 
